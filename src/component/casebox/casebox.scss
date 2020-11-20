@@ -1,0 +1,37 @@
+.casebox {
+	.case-item {
+		font-weight: bold;
+		.status-title {
+			font-size: 1em !important;
+
+			span {
+				margin-left: 15px;
+			}
+		}
+
+		div {
+			position: relative;
+			width: 50%;
+			display: inline-block;
+			&:nth-child(2) {
+				padding-left: 15px;
+
+				&.total {
+					color: #888;
+				}
+				&.active {
+					color: #00d804;
+				}
+				&.recovered {
+					color: #1da1ff;
+				}
+				&.deaths {
+					color: #ff6854;
+				}
+			}
+		}
+		&.list-group-item {
+			border-radius: 0px;
+		}
+	}
+}

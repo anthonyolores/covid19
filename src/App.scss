@@ -1,0 +1,16 @@
+body {
+	color: #444;
+
+	.header-title {
+		font-size: 2em;
+		margin-bottom: 0.5em;
+		margin-top: 1em;
+		font-weight: bold;
+		span:nth-child(2) {
+			color: #1da1ff;
+		}
+	}
+	.custom-select {
+		border-radius: 0px;
+	}
+}
