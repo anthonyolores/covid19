@@ -10,7 +10,7 @@ export type CaseItem = Country & {
     Recovered: number;
     Active: number | undefined;
     Date: string;
-}
+};
 
 export type CaseItemGlobal = {
     NewConfirmed: number,
@@ -20,5 +20,6 @@ export type CaseItemGlobal = {
     NewRecovered: number,
     TotalRecovered: number
 }
+
 
 export type DateRange = { from: string, to: string };

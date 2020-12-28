@@ -28,6 +28,14 @@
 				&.deaths {
 					color: #ff6854;
 				}
+
+				.new {
+					top: -4px;
+					padding-left: 3px;
+					font-size: 0.7em;
+					position: relative;
+					color: #888;
+				}
 			}
 		}
 		&.list-group-item {

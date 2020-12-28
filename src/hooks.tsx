@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Country, CaseItem } from './type';
+import { Country, CaseItem, CaseItemGlobal } from './type';
 import { fetchCountries } from './api';
 
 export const useCountries = (): Array<Country> | undefined => {
@@ -27,5 +27,13 @@ export const useCaseItem = () => {
 	return {
 		caseItems,
 		setCaseItems,
+	};
+};
+
+export const useCaseItemGlobal = () => {
+	const [caseItemGlobal, setCaseItemGlobal] = useState<CaseItemGlobal>();
+	return {
+		caseItemGlobal,
+		setCaseItemGlobal,
 	};
 };

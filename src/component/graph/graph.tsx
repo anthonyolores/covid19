@@ -1,10 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import { CaseItem } from '../../type';
-import { Line } from 'react-chartjs-2';
+import { CaseItem, CaseItemGlobal } from '../../type';
+import { HorizontalBar, Line } from 'react-chartjs-2';
 import './graph.scss';
 
-type GraphProp = {
-	caseItems: ReadonlyArray<CaseItem>;
+type GraphProps = {
+	caseItems?: ReadonlyArray<CaseItem>;
+	caseItemGlobal?: CaseItemGlobal
 };
 
 const caseItemToLineData = (caseItems: ReadonlyArray<CaseItem>) => {
@@ -40,13 +41,44 @@ const caseItemToLineData = (caseItems: ReadonlyArray<CaseItem>) => {
 	};
 };
 
-const Graph: FunctionComponent<GraphProp> = (props: GraphProp) => {
-	if (!!!props.caseItems.length) return null;
+const caseItemToBarData = (caseItem: CaseItemGlobal) => {
+	return {
+		labels: [
+			'Total Confirmed', 'Total Recovered', 'Total Deaths'
+		],
+		datasets: [
+			{
+				label: 'Total',
+				data: [caseItem.TotalConfirmed, caseItem.TotalRecovered, caseItem.TotalDeaths],
+				backgroundColor: ['#54ff57','#1da1ff','#ff6854']
+			},
+		],
+	};
+};
+
+const options = {
+	legend: {
+		display: false
+	 },
+  }
+
+const Graph: FunctionComponent<GraphProps> = ({caseItems, caseItemGlobal }: GraphProps) => {
+
+	if (caseItems && caseItems.length > 1)
 	return (
 		<div className='graph-container'>
-			<Line data={caseItemToLineData(props.caseItems)} />
+			<Line data={caseItemToLineData(caseItems)} />
 		</div>
-	);
+			);	
+
+	if(caseItemGlobal)
+	return (
+		<div className='graph-container'>
+			<HorizontalBar data={caseItemToBarData(caseItemGlobal)} options={options}/>
+		</div>
+			);
+	
+	return null;
 };
 
 export default Graph;

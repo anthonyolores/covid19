@@ -10,7 +10,7 @@ import './casebox.scss';
 
 export type CaseBoxPros = {
 	country: string;
-	onSelectStatus: (caseItems: Array<CaseItem>) => void;
+	onSelectStatus: (caseItems: Array<CaseItem>, caseItemGlobal: CaseItemGlobal | undefined) => void;
 };
 
 const getTotalCaseItem = (
@@ -31,29 +31,18 @@ const getTotalCaseItem = (
 	return caseItem;
 };
 
-const mapGlobalItemToCaseItem = (
-	caseItemGlobal: CaseItemGlobal | undefined
-): CaseItem | undefined => {
-	if (!!!caseItemGlobal) return;
-	return {
-		Active: undefined,
-		Confirmed: caseItemGlobal.TotalConfirmed,
-		Deaths: caseItemGlobal.TotalDeaths,
-		Recovered: caseItemGlobal.TotalRecovered,
-		Country: 'Global',
-		Date: '',
-	};
-};
-
 const addComma = (value: number): string => {
 	return new Intl.NumberFormat().format(value);
 };
 
-const CaseBox: FunctionComponent<CaseBoxPros> = (props: CaseBoxPros) => {
+const CaseBox: FunctionComponent<CaseBoxPros> = ({ country, onSelectStatus}: CaseBoxPros) => {
 	const [caseItems, setCaseItems] = useState<
 		Array<CaseItem> | undefined | null
 	>(null);
-	const [totalCaseItem, setTotalCaseItem] = useState<CaseItem | undefined>(
+	const [totalCaseItem, setTotalCaseItem] = useState<CaseItem| undefined>(
+		undefined
+	);
+	const [totalCaseItemGlobal, setTotalCaseItemGlobal] = useState<CaseItemGlobal| undefined>(
 		undefined
 	);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -64,22 +53,20 @@ const CaseBox: FunctionComponent<CaseBoxPros> = (props: CaseBoxPros) => {
 			if (country !== 'Global') {
 				const caseItems = await fetchCasesByCountry(country);
 				setCaseItems(caseItems);
-				props.onSelectStatus(caseItems || []);
+				onSelectStatus(caseItems || [], undefined);
 			} else {
 				const globalCaseItem = await fetchCasesWorld();
-				setTotalCaseItem(mapGlobalItemToCaseItem(globalCaseItem));
+				setTotalCaseItemGlobal(globalCaseItem);
+				onSelectStatus([], globalCaseItem);
 			}
 			setIsLoading(false);
 		};
-		fetchData(props.country);
-	}, [props.country]);
+		fetchData(country);
+	}, [country]);
 
 	useEffect(() => {
 		setTotalCaseItem(getTotalCaseItem(caseItems));
 	}, [caseItems]);
-
-	if ((caseItems === null && !!!totalCaseItem) || isLoading)
-		return <div> Loading Cases... </div>;
 
 	const transformCaseBox = (caseItem: CaseItem | undefined) => {
 		return (
@@ -121,7 +108,46 @@ const CaseBox: FunctionComponent<CaseBoxPros> = (props: CaseBoxPros) => {
 		);
 	};
 
-	return transformCaseBox(totalCaseItem);
+	const transformCaseBoxGlobal = (caseItem: CaseItemGlobal | undefined) => {
+		return (
+			(caseItem && (
+				<div className='casebox'>
+					<ListGroup.Item className='case-item'>
+						<div className='status-title total'>
+							<FaCalculator /> <span>Total Confirmed</span>
+						</div>
+						<div className='active'> {addComma(caseItem.TotalConfirmed)} <span className='new'>(new {addComma(caseItem.NewConfirmed)})</span></div>
+					</ListGroup.Item>
+					<ListGroup.Item className='case-item'>
+						<div className='status-title total'>
+							<FaHeartbeat /> <span>Total Recovered</span>
+						</div>
+						<div className='recovered'> {addComma(caseItem.TotalRecovered)} <span className='new'>(new {addComma(caseItem.NewRecovered)})</span></div>
+					</ListGroup.Item>
+					<ListGroup.Item className='case-item'>
+						<div className='status-title total'>
+							<FaCross /> <span>Total Deaths</span>
+						</div>
+						<div className='deaths'> {addComma(caseItem.TotalDeaths)} <span className='new'>(new {addComma(caseItem.NewDeaths)})</span></div>
+					</ListGroup.Item>
+				</div>
+			)) || (
+				<ListGroup.Item
+					style={{ backgroundColor: '#f8f8f8', border: 'none', color: '#888' }}>
+					No data found
+				</ListGroup.Item>
+			)
+		);
+	};
+
+	if (isLoading)
+		return <div> Loading data... </div>;
+
+	if(country !== 'Global')
+		return transformCaseBox(totalCaseItem);
+	else
+		return transformCaseBoxGlobal(totalCaseItemGlobal);
+
 };
 
 export default CaseBox;
